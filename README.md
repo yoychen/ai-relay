@@ -2,13 +2,58 @@
 
 終端機 AI 輔助開發工具，解決在無法使用 IDE AI Agent 的環境下，需手動與 Web 版 LLM 互動的痛點。
 
-## 安裝與啟動
+## 安裝方式
+
+### 方法一：全域安裝（本機開發，推薦）
 
 ```bash
-# 安裝依賴（首次使用）
+git clone <repo-url>
+cd code-partner
 npm install
+npm run build
+npm link
+```
 
-# 啟動工具
+安裝後可在任意目錄直接執行：
+
+```bash
+code-partner
+```
+
+解除安裝：
+
+```bash
+npm unlink -g code-partner
+```
+
+---
+
+### 方法二：從 .tgz 檔案安裝（離線分發）
+
+```bash
+# 在專案目錄打包
+npm run build
+npm pack
+# 產生 code-partner-1.0.0.tgz
+
+# 在目標機器安裝
+npm install -g code-partner-1.0.0.tgz
+```
+
+---
+
+### 方法三：從 npm 安裝（發布後）
+
+```bash
+npm install -g code-partner
+```
+
+---
+
+### 從原始碼直接執行（無需安裝）
+
+```bash
+npm install
 npm run dev
 ```
 
@@ -33,7 +78,9 @@ npm run dev
    ```
    幫 formatName 加上空值檢查，並將結果轉為小寫
    ```
-4. 出現 `✅ 已複製到剪貼簿！` 後，直接貼到 LLM 對話框
+4. 選擇輸出方式：
+   - **複製到剪貼簿**：直接貼到 LLM 對話框
+   - **儲存到檔案**：寫入 `prompt_output.md`，可用編輯器手動開啟複製（適用剪貼簿無法使用的環境）
 
 ---
 
@@ -43,9 +90,11 @@ npm run dev
 
 **操作步驟：**
 
-1. 複製 LLM 的完整回覆內容到剪貼簿
-2. 在主選單選擇「套用修改」
-3. 工具自動讀取剪貼簿、解析動作、依序執行，並即時顯示每步狀態：
+1. 在主選單選擇「套用修改」
+2. 選擇 LLM 輸出來源：
+   - **從剪貼簿讀取**：複製 LLM 回覆後直接選此項
+   - **從檔案讀取**：輸入檔案路徑（預設 `prompt_output.md`），適用剪貼簿無法使用的環境
+3. 工具自動解析動作、依序執行，並即時顯示每步狀態：
    ```
    ✅ [CREATE] src/components/NewButton.tsx
    ✅ [UPDATE] src/utils/format.ts

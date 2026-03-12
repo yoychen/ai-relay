@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "tsx src/index.tsx",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json && bash scripts/postbuild.sh",
     "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },
   "keywords": [],

@@ -1,0 +1,4 @@
+node_modules/
+dist/
+prompt_output.md
+.claude/

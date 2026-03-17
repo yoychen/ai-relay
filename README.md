@@ -78,9 +78,9 @@ npm run dev
    ```
    幫 formatName 加上空值檢查，並將結果轉為小寫
    ```
-4. 選擇輸出方式：
-   - **複製到剪貼簿**：直接貼到 LLM 對話框
-   - **儲存到檔案**：寫入 `prompt_output.md`，可用編輯器手動開啟複製（適用剪貼簿無法使用的環境）
+4. Prompt 產生後自動輸出（依啟動模式）：
+   - **預設**：直接複製到剪貼簿，貼到 LLM 對話框即可
+   - **`--file` 模式**：寫入 `relay_prompt.md`，可用編輯器手動開啟複製
 
 ---
 
@@ -91,9 +91,9 @@ npm run dev
 **操作步驟：**
 
 1. 在主選單選擇「套用修改」
-2. 選擇 LLM 輸出來源：
-   - **從剪貼簿讀取**：複製 LLM 回覆後直接選此項
-   - **從檔案讀取**：輸入檔案路徑（預設 `prompt_output.md`），適用剪貼簿無法使用的環境
+2. 工具自動讀取 LLM 輸出（依啟動模式）：
+   - **預設**：直接從剪貼簿讀取
+   - **`--file` 模式**：提示輸入檔案路徑（預設 `relay_response.md`）
 3. 工具自動解析動作、依序執行，並即時顯示每步狀態：
    ```
    ✅ [CREATE] src/components/NewButton.tsx
@@ -152,6 +152,22 @@ export const NewButton = () => {
 3. 貼到 Web LLM → 取得回覆 → 複製 LLM 的完整回覆
         ↓
 4. 回到工具 → 選擇「套用修改」→ 自動套用到本地檔案
+```
+
+---
+
+## 啟動選項
+
+| 指令 | 行為 |
+|------|------|
+| `ai-relay` | 預設模式：Prompt 複製到剪貼簿，Apply 從剪貼簿讀取 |
+| `ai-relay --file` | 檔案模式：Prompt 儲存到 `relay_prompt.md`，Apply 讀取 `relay_response.md` |
+
+開發模式同樣支援：
+
+```bash
+npm run dev              # 預設（剪貼簿）模式
+npm run dev -- --file    # 檔案模式
 ```
 
 ---

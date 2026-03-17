@@ -1,27 +1,20 @@
 import React, { useState } from 'react';
 import { Text, Box, useInput } from 'ink';
 import TextInput from 'ink-text-input';
-import SelectInput from 'ink-select-input';
 import fs from 'fs';
 import path from 'path';
 import { writeClipboard } from '../core/clipboard.js';
 import { generatePrompt } from '../core/promptGen.js';
 import { FilePicker } from './FilePicker.js';
 
-type Step = 'files' | 'requirement' | 'choose' | 'error';
+type Step = 'files' | 'requirement' | 'error';
 
-const OUTPUT_FILE = 'prompt_output.md';
+const OUTPUT_FILE = 'relay_prompt.md';
 
-const actionItems = [
-  { label: '複製到剪貼簿', value: 'clipboard' },
-  { label: `儲存到檔案 (${OUTPUT_FILE})`, value: 'file' },
-];
-
-export function GeneratePrompt({ onBack }: { onBack: () => void }) {
+export function GeneratePrompt({ onBack, fileMode }: { onBack: () => void; fileMode: boolean }) {
   const [step, setStep] = useState<Step>('files');
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [requirement, setRequirement] = useState('');
-  const [prompt, setPrompt] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
   useInput((input, key) => {
@@ -34,24 +27,12 @@ export function GeneratePrompt({ onBack }: { onBack: () => void }) {
   };
 
   const handleRequirementSubmit = (value: string) => {
-    setRequirement(value);
     try {
       const generated = generatePrompt(selectedFiles, value);
-      setPrompt(generated);
-      setStep('choose');
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : String(err));
-      setStep('error');
-    }
-  };
-
-  const handleActionSelect = (item: { value: string }) => {
-    try {
-      if (item.value === 'clipboard') {
-        writeClipboard(prompt);
+      if (fileMode) {
+        fs.writeFileSync(path.resolve(process.cwd(), OUTPUT_FILE), generated, 'utf-8');
       } else {
-        const outputPath = path.resolve(process.cwd(), OUTPUT_FILE);
-        fs.writeFileSync(outputPath, prompt, 'utf-8');
+        writeClipboard(generated);
       }
       onBack();
     } catch (err) {
@@ -79,17 +60,10 @@ export function GeneratePrompt({ onBack }: { onBack: () => void }) {
         </Box>
       )}
 
-      {step === 'choose' && (
-        <Box flexDirection="column">
-          <Text>Prompt 已產生，請選擇輸出方式：</Text>
-          <SelectInput items={actionItems} onSelect={handleActionSelect} />
-        </Box>
-      )}
-
       {step === 'error' && (
         <Box flexDirection="column">
           <Text color="red">❌ 發生錯誤：{errorMsg}</Text>
-          <Text dimColor>按 ESC 返回主選單</Text>
+          <Text dimColor>按 ESC / q 返回主選單</Text>
         </Box>
       )}
     </Box>

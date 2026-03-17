@@ -1,4 +1,5 @@
 node_modules/
 dist/
-prompt_output.md
+relay_prompt.md
+relay_response.md
 .claude/

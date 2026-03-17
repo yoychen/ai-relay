@@ -1,23 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, Box, useInput } from 'ink';
 import TextInput from 'ink-text-input';
-import SelectInput from 'ink-select-input';
 import fs from 'fs';
 import { readClipboard } from '../core/clipboard.js';
 import { parse } from '../core/parser.js';
 import { applyActions, ApplyResult } from '../core/applier.js';
 
-type Status = 'choose' | 'file-input' | 'reading' | 'applying' | 'error';
+type Status = 'file-input' | 'reading' | 'applying' | 'error';
 
-const DEFAULT_FILE = 'prompt_output.md';
+const DEFAULT_FILE = 'relay_response.md';
 
-const sourceItems = [
-  { label: '從剪貼簿讀取', value: 'clipboard' },
-  { label: `從檔案讀取 (預設: ${DEFAULT_FILE})`, value: 'file' },
-];
-
-export function ApplyModifications({ onBack }: { onBack: () => void }) {
-  const [status, setStatus] = useState<Status>('choose');
+export function ApplyModifications({ onBack, fileMode }: { onBack: () => void; fileMode: boolean }) {
+  const [status, setStatus] = useState<Status>(fileMode ? 'file-input' : 'reading');
   const [fileInput, setFileInput] = useState(DEFAULT_FILE);
   const [results, setResults] = useState<ApplyResult[]>([]);
   const [errorMsg, setErrorMsg] = useState('');
@@ -49,20 +43,16 @@ export function ApplyModifications({ onBack }: { onBack: () => void }) {
     }
   };
 
-  const handleSourceSelect = (item: { value: string }) => {
-    if (item.value === 'clipboard') {
-      setStatus('reading');
+  useEffect(() => {
+    if (!fileMode) {
       try {
-        const text = readClipboard();
-        runApply(text);
+        runApply(readClipboard());
       } catch (err) {
         setErrorMsg(err instanceof Error ? err.message : String(err));
         setStatus('error');
       }
-    } else {
-      setStatus('file-input');
     }
-  };
+  }, []);
 
   const handleFileSubmit = (value: string) => {
     const filePath = value.trim() || DEFAULT_FILE;
@@ -79,15 +69,8 @@ export function ApplyModifications({ onBack }: { onBack: () => void }) {
   return (
     <Box flexDirection="column" padding={1}>
       <Text bold>套用修改</Text>
-      <Text dimColor>（按 ESC 返回主選單）</Text>
+      <Text dimColor>（按 ESC / q 返回主選單）</Text>
       <Text> </Text>
-
-      {status === 'choose' && (
-        <Box flexDirection="column">
-          <Text>選擇 LLM 輸出來源：</Text>
-          <SelectInput items={sourceItems} onSelect={handleSourceSelect} />
-        </Box>
-      )}
 
       {status === 'file-input' && (
         <Box flexDirection="column">
@@ -115,7 +98,7 @@ export function ApplyModifications({ onBack }: { onBack: () => void }) {
       {status === 'error' && (
         <Box flexDirection="column">
           <Text color="red">❌ 錯誤：{errorMsg}</Text>
-          <Text dimColor>按 ESC 返回主選單</Text>
+          <Text dimColor>按 ESC / q 返回主選單</Text>
         </Box>
       )}
     </Box>

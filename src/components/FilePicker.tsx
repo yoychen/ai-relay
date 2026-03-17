@@ -106,8 +106,7 @@ export function FilePicker({ onSubmit, onCancel }: FilePickerProps) {
             <Box key={file}>
               <Text color={isCursor ? 'cyan' : undefined} bold={isCursor}>
                 {isCursor ? '▶ ' : '  '}
-                {isSelected ? '[x] ' : '[ ] '}
-                {file}
+                {isSelected ? <Text color="green">✓ {file}</Text> : file}
               </Text>
             </Box>
           );
@@ -129,7 +128,7 @@ export function FilePicker({ onSubmit, onCancel }: FilePickerProps) {
         </Box>
       )}
 
-      <Text dimColor>↑↓ 導航 │ Enter 選取／取消 │ Tab 確認送出 │ ESC 取消</Text>
+      <Text dimColor>↑↓ 導航 │ Enter 選取 │ Tab 確認送出 │ ESC 取消</Text>
     </Box>
   );
 }

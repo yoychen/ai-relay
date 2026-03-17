@@ -7,7 +7,7 @@ import { readClipboard } from '../core/clipboard.js';
 import { parse } from '../core/parser.js';
 import { applyActions, ApplyResult } from '../core/applier.js';
 
-type Status = 'choose' | 'file-input' | 'reading' | 'applying' | 'done' | 'error';
+type Status = 'choose' | 'file-input' | 'reading' | 'applying' | 'error';
 
 const DEFAULT_FILE = 'prompt_output.md';
 
@@ -22,8 +22,8 @@ export function ApplyModifications({ onBack }: { onBack: () => void }) {
   const [results, setResults] = useState<ApplyResult[]>([]);
   const [errorMsg, setErrorMsg] = useState('');
 
-  useInput((_, key) => {
-    if (key.escape) onBack();
+  useInput((input, key) => {
+    if (status === 'error' && (key.escape || input === 'q' || input === 'Q')) onBack();
   });
 
   const runApply = (text: string) => {
@@ -37,7 +37,12 @@ export function ApplyModifications({ onBack }: { onBack: () => void }) {
         setResults([...collected]);
       });
 
-      setStatus('done');
+      const failed = collected.filter((r) => !r.success).length;
+      if (failed === 0) {
+        onBack();
+      } else {
+        setStatus('error');
+      }
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : String(err));
       setStatus('error');
@@ -71,9 +76,6 @@ export function ApplyModifications({ onBack }: { onBack: () => void }) {
     }
   };
 
-  const successCount = results.filter((r) => r.success).length;
-  const failCount = results.filter((r) => !r.success).length;
-
   return (
     <Box flexDirection="column" padding={1}>
       <Text bold>套用修改</Text>
@@ -96,7 +98,7 @@ export function ApplyModifications({ onBack }: { onBack: () => void }) {
 
       {status === 'reading' && <Text color="yellow">正在讀取內容...</Text>}
 
-      {(status === 'applying' || status === 'done') && (
+      {status === 'applying' && (
         <Box flexDirection="column">
           {results.map((r, i) => (
             <Text key={i}>
@@ -107,15 +109,6 @@ export function ApplyModifications({ onBack }: { onBack: () => void }) {
               )}
             </Text>
           ))}
-        </Box>
-      )}
-
-      {status === 'done' && (
-        <Box flexDirection="column" marginTop={1}>
-          <Text>完成：<Text color="green">{successCount} 成功</Text>
-            {failCount > 0 && <Text>，<Text color="red">{failCount} 失敗</Text></Text>}
-          </Text>
-          <Text dimColor>按 ESC 返回主選單</Text>
         </Box>
       )}
 

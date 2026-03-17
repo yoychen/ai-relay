@@ -8,7 +8,7 @@ import { writeClipboard } from '../core/clipboard.js';
 import { generatePrompt } from '../core/promptGen.js';
 import { FilePicker } from './FilePicker.js';
 
-type Step = 'files' | 'requirement' | 'choose' | 'done' | 'error';
+type Step = 'files' | 'requirement' | 'choose' | 'error';
 
 const OUTPUT_FILE = 'prompt_output.md';
 
@@ -22,11 +22,10 @@ export function GeneratePrompt({ onBack }: { onBack: () => void }) {
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [requirement, setRequirement] = useState('');
   const [prompt, setPrompt] = useState('');
-  const [doneMsg, setDoneMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  useInput((_, key) => {
-    if (key.escape && step !== 'files') onBack();
+  useInput((input, key) => {
+    if (step === 'error' && (key.escape || input === 'q' || input === 'Q')) onBack();
   });
 
   const handleFilesSubmit = (files: string[]) => {
@@ -50,13 +49,11 @@ export function GeneratePrompt({ onBack }: { onBack: () => void }) {
     try {
       if (item.value === 'clipboard') {
         writeClipboard(prompt);
-        setDoneMsg('✅ 已複製到剪貼簿！');
       } else {
         const outputPath = path.resolve(process.cwd(), OUTPUT_FILE);
         fs.writeFileSync(outputPath, prompt, 'utf-8');
-        setDoneMsg(`✅ 已儲存到 ${outputPath}`);
       }
-      setStep('done');
+      onBack();
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : String(err));
       setStep('error');
@@ -86,13 +83,6 @@ export function GeneratePrompt({ onBack }: { onBack: () => void }) {
         <Box flexDirection="column">
           <Text>Prompt 已產生，請選擇輸出方式：</Text>
           <SelectInput items={actionItems} onSelect={handleActionSelect} />
-        </Box>
-      )}
-
-      {step === 'done' && (
-        <Box flexDirection="column">
-          <Text color="green">{doneMsg}</Text>
-          <Text dimColor>按 ESC 返回主選單</Text>
         </Box>
       )}
 

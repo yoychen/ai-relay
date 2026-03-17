@@ -30,6 +30,7 @@ export const MAIN_PROMPT_TEMPLATE = `# 【背景：相關原始碼】
 - CLI 工具使用**嚴格字串比對**（非模糊），一個字元不符即套用失敗。
 
 **格式範例：**
+為 formatName 加上空值檢查並轉為小寫
 \`\`\`
 @@@ ACTION: UPDATE
 @@@ FILE: src/utils/format.ts
@@ -51,6 +52,7 @@ export function formatName(name: string) {
 不需要 SEARCH 區塊，直接使用 \`<CONTENT>\`、\`</CONTENT>\` 包裝完整的檔案內容。
 
 **格式範例：**
+新增 NewButton 元件
 \`\`\`
 @@@ ACTION: CREATE
 @@@ FILE: src/components/NewButton.tsx
@@ -68,6 +70,7 @@ export const NewButton = () => {
 不需要任何內容區塊，只需指定檔案路徑。
 
 **格式範例：**
+刪除已棄用的工具函式檔案
 \`\`\`
 @@@ ACTION: DELETE
 @@@ FILE: src/utils/oldHelper.ts

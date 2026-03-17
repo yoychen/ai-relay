@@ -16,6 +16,8 @@
   "license": "ISC",
   "dependencies": {
     "clipboardy": "^5.3.1",
+    "fast-glob": "^3.3.3",
+    "fuse.js": "^7.1.0",
     "ink": "^6.8.0",
     "ink-select-input": "^6.2.0",
     "ink-text-input": "^6.0.0",

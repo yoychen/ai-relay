@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { writeClipboard } from '../core/clipboard.js';
 import { generatePrompt } from '../core/promptGen.js';
+import { FilePicker } from './FilePicker.js';
 
 type Step = 'files' | 'requirement' | 'choose' | 'done' | 'error';
 
@@ -18,26 +19,25 @@ const actionItems = [
 
 export function GeneratePrompt({ onBack }: { onBack: () => void }) {
   const [step, setStep] = useState<Step>('files');
-  const [filesInput, setFilesInput] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [requirement, setRequirement] = useState('');
   const [prompt, setPrompt] = useState('');
   const [doneMsg, setDoneMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
   useInput((_, key) => {
-    if (key.escape) onBack();
+    if (key.escape && step !== 'files') onBack();
   });
 
-  const handleFilesSubmit = (value: string) => {
-    setFilesInput(value);
+  const handleFilesSubmit = (files: string[]) => {
+    setSelectedFiles(files);
     setStep('requirement');
   };
 
   const handleRequirementSubmit = (value: string) => {
     setRequirement(value);
-    const filePaths = filesInput.split(',').map((s) => s.trim()).filter(Boolean);
     try {
-      const generated = generatePrompt(filePaths, value);
+      const generated = generatePrompt(selectedFiles, value);
       setPrompt(generated);
       setStep('choose');
     } catch (err) {
@@ -70,15 +70,12 @@ export function GeneratePrompt({ onBack }: { onBack: () => void }) {
       <Text> </Text>
 
       {step === 'files' && (
-        <Box flexDirection="column">
-          <Text>輸入目標檔案路徑（多個檔案以逗號分隔）：</Text>
-          <TextInput value={filesInput} onChange={setFilesInput} onSubmit={handleFilesSubmit} />
-        </Box>
+        <FilePicker onSubmit={handleFilesSubmit} onCancel={onBack} />
       )}
 
       {step === 'requirement' && (
         <Box flexDirection="column">
-          <Text>檔案：<Text color="cyan">{filesInput}</Text></Text>
+          <Text>檔案：<Text color="cyan">{selectedFiles.join(', ')}</Text></Text>
           <Text> </Text>
           <Text>輸入本次修改需求／目的：</Text>
           <TextInput value={requirement} onChange={setRequirement} onSubmit={handleRequirementSubmit} />

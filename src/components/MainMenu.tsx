@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, Box } from 'ink';
+import { Text, Box, useInput } from 'ink';
 import SelectInput from 'ink-select-input';
 import { GeneratePrompt } from './GeneratePrompt.js';
 import { ApplyModifications } from './ApplyModifications.js';
@@ -19,6 +19,12 @@ export function MainMenu({ fileMode }: { fileMode: boolean }) {
     setSuccessMsg(msg ?? '');
     setScreen('menu');
   };
+
+  useInput((input) => {
+    if (screen !== 'menu') return;
+    if (input === '1') { setSuccessMsg(''); setScreen('generate'); }
+    if (input === '2') { setSuccessMsg(''); setScreen('apply'); }
+  });
 
   if (screen === 'generate') {
     return <GeneratePrompt onBack={handleBack} fileMode={fileMode} />;

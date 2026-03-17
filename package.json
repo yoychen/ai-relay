@@ -1,10 +1,10 @@
 {
-  "name": "code-partner",
+  "name": "ai-relay",
   "version": "1.0.0",
   "description": "TUI AI Coding Assistant",
   "type": "module",
   "bin": {
-    "code-partner": "./dist/index.js"
+    "ai-relay": "./dist/index.js"
   },
   "scripts": {
     "dev": "tsx src/index.tsx",

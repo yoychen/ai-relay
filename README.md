@@ -1,4 +1,4 @@
-# Code Partner
+# AI Relay
 
 終端機 AI 輔助開發工具，解決在無法使用 IDE AI Agent 的環境下，需手動與 Web 版 LLM 互動的痛點。
 
@@ -8,7 +8,7 @@
 
 ```bash
 git clone <repo-url>
-cd code-partner
+cd ai-relay
 npm install
 npm run build
 npm link
@@ -17,13 +17,13 @@ npm link
 安裝後可在任意目錄直接執行：
 
 ```bash
-code-partner
+ai-relay
 ```
 
 解除安裝：
 
 ```bash
-npm unlink -g code-partner
+npm unlink -g ai-relay
 ```
 
 ---
@@ -34,10 +34,10 @@ npm unlink -g code-partner
 # 在專案目錄打包
 npm run build
 npm pack
-# 產生 code-partner-1.0.0.tgz
+# 產生 ai-relay-1.0.0.tgz
 
 # 在目標機器安裝
-npm install -g code-partner-1.0.0.tgz
+npm install -g ai-relay-1.0.0.tgz
 ```
 
 ---
@@ -45,7 +45,7 @@ npm install -g code-partner-1.0.0.tgz
 ### 方法三：從 npm 安裝（發布後）
 
 ```bash
-npm install -g code-partner
+npm install -g ai-relay
 ```
 
 ---

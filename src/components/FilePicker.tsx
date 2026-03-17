@@ -46,7 +46,7 @@ export function FilePicker({ onSubmit, onCancel }: FilePickerProps) {
   }, [query]);
 
   useInput((_input, key) => {
-    if (key.escape) {
+    if (key.escape || _input === 'q') {
       onCancel();
       return;
     }
@@ -128,7 +128,7 @@ export function FilePicker({ onSubmit, onCancel }: FilePickerProps) {
         </Box>
       )}
 
-      <Text dimColor>↑↓ 導航 │ Enter 選取 │ Tab 確認送出 │ ESC 取消</Text>
+      <Text dimColor>↑↓ 導航 │ Enter 選取 │ Tab 確認送出 │ ESC / q 取消</Text>
     </Box>
   );
 }

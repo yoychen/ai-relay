@@ -11,18 +11,23 @@ export type CreateAction = {
   content: string;
 };
 
-export type Action = UpdateAction | CreateAction;
+export type DeleteAction = {
+  action: 'DELETE';
+  file: string;
+};
+
+export type Action = UpdateAction | CreateAction | DeleteAction;
 
 export function parse(input: string): Action[] {
   const results: Action[] = [];
 
   // Split by @@@ ACTION: to get individual blocks
-  const blockPattern = /@@@ ACTION:\s*(UPDATE|CREATE)/g;
-  const indices: Array<{ index: number; action: 'UPDATE' | 'CREATE' }> = [];
+  const blockPattern = /@@@ ACTION:\s*(UPDATE|CREATE|DELETE)/g;
+  const indices: Array<{ index: number; action: 'UPDATE' | 'CREATE' | 'DELETE' }> = [];
 
   let match: RegExpExecArray | null;
   while ((match = blockPattern.exec(input)) !== null) {
-    indices.push({ index: match.index, action: match[1] as 'UPDATE' | 'CREATE' });
+    indices.push({ index: match.index, action: match[1] as 'UPDATE' | 'CREATE' | 'DELETE' });
   }
 
   for (let i = 0; i < indices.length; i++) {
@@ -51,7 +56,7 @@ export function parse(input: string): Action[] {
         search: searchMatch[1],
         replace: replaceMatch[1],
       });
-    } else {
+    } else if (actionType === 'CREATE') {
       const contentMatch = /<CONTENT>\n([\s\S]*?)\n<\/CONTENT>/.exec(block);
 
       if (!contentMatch) {
@@ -63,6 +68,8 @@ export function parse(input: string): Action[] {
         file,
         content: contentMatch[1],
       });
+    } else {
+      results.push({ action: 'DELETE', file });
     }
   }
 

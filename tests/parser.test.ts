@@ -116,6 +116,34 @@ export default Button;
     }
   });
 
+  test('解析單一 DELETE 區塊', () => {
+    const input = `@@@ ACTION: DELETE
+@@@ FILE: src/utils/oldHelper.ts`;
+
+    const result = parse(input);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual({
+      action: 'DELETE',
+      file: 'src/utils/oldHelper.ts',
+    });
+  });
+
+  test('DELETE 可與其他動作混合解析', () => {
+    const input = `@@@ ACTION: DELETE
+@@@ FILE: src/old.ts
+@@@ ACTION: CREATE
+@@@ FILE: src/new.ts
+<CONTENT>
+const x = 1;
+</CONTENT>`;
+
+    const result = parse(input);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toEqual({ action: 'DELETE', file: 'src/old.ts' });
+    expect(result[1].action).toBe('CREATE');
+    expect(result[1].file).toBe('src/new.ts');
+  });
+
   test('空字串回傳空陣列', () => {
     expect(parse('')).toEqual([]);
   });

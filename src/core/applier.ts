@@ -3,7 +3,7 @@ import path from 'path';
 import { Action } from './parser.js';
 
 export type ApplyResult = {
-  action: 'UPDATE' | 'CREATE';
+  action: 'UPDATE' | 'CREATE' | 'DELETE';
   file: string;
   success: boolean;
   error?: string;
@@ -23,7 +23,7 @@ export function applyActions(
         const updated = content.replace(action.search, action.replace);
         fs.writeFileSync(action.file, updated, 'utf-8');
         onProgress({ action: 'UPDATE', file: action.file, success: true });
-      } else {
+      } else if (action.action === 'CREATE') {
         if (fs.existsSync(action.file)) {
           throw new Error(`File already exists: ${action.file}`);
         }
@@ -31,6 +31,12 @@ export function applyActions(
         fs.mkdirSync(dir, { recursive: true });
         fs.writeFileSync(action.file, action.content, 'utf-8');
         onProgress({ action: 'CREATE', file: action.file, success: true });
+      } else {
+        if (!fs.existsSync(action.file)) {
+          throw new Error(`File not found: ${action.file}`);
+        }
+        fs.unlinkSync(action.file);
+        onProgress({ action: 'DELETE', file: action.file, success: true });
       }
     } catch (err) {
       const error = err instanceof Error ? err.message : String(err);

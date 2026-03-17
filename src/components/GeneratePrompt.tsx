@@ -11,7 +11,7 @@ type Step = 'files' | 'requirement' | 'error';
 
 const OUTPUT_FILE = 'relay_prompt.md';
 
-export function GeneratePrompt({ onBack, fileMode }: { onBack: () => void; fileMode: boolean }) {
+export function GeneratePrompt({ onBack, fileMode }: { onBack: (msg?: string) => void; fileMode: boolean }) {
   const [step, setStep] = useState<Step>('files');
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [requirement, setRequirement] = useState('');
@@ -34,7 +34,7 @@ export function GeneratePrompt({ onBack, fileMode }: { onBack: () => void; fileM
       } else {
         writeClipboard(generated);
       }
-      onBack();
+      onBack(fileMode ? `Prompt 已寫入 ${OUTPUT_FILE}` : 'Prompt 已複製到剪貼簿');
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : String(err));
       setStep('error');

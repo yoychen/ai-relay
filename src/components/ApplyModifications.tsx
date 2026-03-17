@@ -10,7 +10,7 @@ type Status = 'file-input' | 'reading' | 'applying' | 'error';
 
 const DEFAULT_FILE = 'relay_response.md';
 
-export function ApplyModifications({ onBack, fileMode }: { onBack: () => void; fileMode: boolean }) {
+export function ApplyModifications({ onBack, fileMode }: { onBack: (msg?: string) => void; fileMode: boolean }) {
   const [status, setStatus] = useState<Status>(fileMode ? 'file-input' : 'reading');
   const [fileInput, setFileInput] = useState(DEFAULT_FILE);
   const [results, setResults] = useState<ApplyResult[]>([]);
@@ -33,7 +33,7 @@ export function ApplyModifications({ onBack, fileMode }: { onBack: () => void; f
 
       const failed = collected.filter((r) => !r.success).length;
       if (failed === 0) {
-        onBack();
+        onBack(`已套用 ${collected.length} 項修改`);
       } else {
         setStatus('error');
       }

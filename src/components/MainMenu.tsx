@@ -13,13 +13,19 @@ const items = [
 
 export function MainMenu({ fileMode }: { fileMode: boolean }) {
   const [screen, setScreen] = useState<Screen>('menu');
+  const [successMsg, setSuccessMsg] = useState('');
+
+  const handleBack = (msg?: string) => {
+    setSuccessMsg(msg ?? '');
+    setScreen('menu');
+  };
 
   if (screen === 'generate') {
-    return <GeneratePrompt onBack={() => setScreen('menu')} fileMode={fileMode} />;
+    return <GeneratePrompt onBack={handleBack} fileMode={fileMode} />;
   }
 
   if (screen === 'apply') {
-    return <ApplyModifications onBack={() => setScreen('menu')} fileMode={fileMode} />;
+    return <ApplyModifications onBack={handleBack} fileMode={fileMode} />;
   }
 
   return (
@@ -27,10 +33,11 @@ export function MainMenu({ fileMode }: { fileMode: boolean }) {
       <Text bold>AI Relay - TUI AI Coding Assistant</Text>
       <Text dimColor>模式：{fileMode ? '📁 檔案模式 (--file)' : '📋 剪貼簿模式'}</Text>
       <Text> </Text>
+      {successMsg ? <><Text color="green">✅ {successMsg}</Text><Text> </Text></> : <Text> </Text>}
       <Text>請選擇操作：</Text>
       <SelectInput
         items={items}
-        onSelect={(item) => setScreen(item.value as Screen)}
+        onSelect={(item) => { setSuccessMsg(''); setScreen(item.value as Screen); }}
       />
     </Box>
   );
